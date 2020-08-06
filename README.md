@@ -59,6 +59,7 @@ export GITHUB_TOKEN=token1,token2...
 
 # Todo
 
+- fix the output bug when the file is only 1 line (strpos)
 - change the order of the extra searches ?
 - ?
 
@@ -66,8 +67,8 @@ export GITHUB_TOKEN=token1,token2...
 # Changelog
 
 **06/08/2020**
-- added an option to force the regexp to be case insensitive  
-- creation  
+- added an option to force the regexp to be case insensitive
+- creation
 
 
 ---
