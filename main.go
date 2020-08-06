@@ -35,6 +35,7 @@ type Search struct {
 }
 
 type Config struct {
+	output_mode int
 	domain string
 	output string
 	fpOutput *os.File
@@ -266,14 +267,22 @@ func doItem(i item) {
 				}
 
 				if k == 0 {
-					var tmp = fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), i.HtmlUrl )
-					output = output + fmt.Sprintf("%s\n",au.Yellow(tmp).Bold())
+					if config.output_mode == 0 {
+						var tmp = fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), i.HtmlUrl )
+						output = output + fmt.Sprintf("%s\n",au.Yellow(tmp).Bold())
+					} else if config.output_mode == 1 {
+						output = i.HtmlUrl + "\n"
+					}
 					// PrintInfos( "info", i.HtmlUrl )
 				} else {
-					output = output + "---\n"
+					if config.output_mode == 0 {
+						output = output + "---\n"
+					}
 				}
 
-				output = output + printMatch( code, match )
+				if config.output_mode != 1 {
+					output = output + printMatch( code, match )
+				}
 			}
 
 			fmt.Print( output )
@@ -283,6 +292,10 @@ func doItem(i item) {
 
 
 func printMatch( code string, match []int ) string {
+
+	if config.output_mode == 2 {
+		return code[match[0]:match[1]]+"\n"
+	}
 
 	var prefix = get_prefix( code, match[0], config.n_context+1 );
 	// fmt.Printf( ">>>%s<<<", prefix )
@@ -362,6 +375,8 @@ func main() {
 	var token string
 	var rgxp string
 	var stop_notoken bool
+	var output_urls bool
+	var output_matchedparts bool
 	var force_ignorecase bool
 	var f_language string
 	var f_noise string
@@ -371,6 +386,8 @@ func main() {
 	flag.StringVar( &token, "t", "", "github token (required)" )
 	flag.BoolVar( &stop_notoken, "k", false, "exit the program when all tokens have been disabled" )
 	flag.BoolVar( &force_ignorecase, "i", false, "force the regexp to be case insensitive" )
+	flag.BoolVar( &output_urls, "u", false, "display only urls" )
+	flag.BoolVar( &output_matchedparts, "o", false, "display only matched parts" )
 	// flag.StringVar( &f_language, "l", "", "language file (optional)" )
 	// flag.StringVar( &f_noise, "n", "", "noise file (optional)" )
 	flag.Parse()
@@ -388,6 +405,14 @@ func main() {
 		rgxp = "(?i)"+rgxp
 	}
 
+	config.output_mode = 0
+	if output_urls {
+		config.output_mode = 1
+	}
+	if output_matchedparts {
+		config.output_mode = 2
+	}
+
 	config.n_context = 3
 	config.search = url.QueryEscape(config.search)
 	// config.search = strings.ReplaceAll(config.search, "-", "%2D")
@@ -395,7 +420,9 @@ func main() {
 
 	parseToken( token )
 
-	banner()
+	if config.output_mode == 0 {
+		banner()
+	}
 
 	var n_token = len(config.tokens)
 	var wg sync.WaitGroup
@@ -630,9 +657,7 @@ func displayConfig() {
 
 func PrintInfos(infos_type string, str string) {
 
-	if config.raw && infos_type == "found" {
-		fmt.Println( str )
-	} else if !config.raw {
+	if config.output_mode == 0 {
 		str = fmt.Sprintf("[%s] %s", time.Now().Format("15:04:05"), str )
 
 		switch infos_type {

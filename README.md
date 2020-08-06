@@ -59,8 +59,6 @@ export GITHUB_TOKEN=token1,token2...
 
 # Todo
 
-- add option `-u` to display urls only (raw format)
-- add option `-o` to display only the matched parts (raw format)
 - fix the output bug when the file is only 1 line (strpos)
 - change the order of the extra searches ?
 - ?
@@ -69,6 +67,8 @@ export GITHUB_TOKEN=token1,token2...
 # Changelog
 
 **06/08/2020**
+- added an option to display urls only
+- added an option to display only the matched parts
 - added an option to force the regexp to be case insensitive
 - creation
 
