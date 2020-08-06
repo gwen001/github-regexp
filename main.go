@@ -441,8 +441,8 @@ func main() {
 	displayConfig()
 
 	t_search = append( t_search, Search{keyword:config.search, sort:"indexed", order:"desc"} )
-	// t_search = append( t_search, Search{sort:"indexed", order:"asc"} )
-	// t_search = append( t_search, Search{sort:"", order:"desc"} )
+	t_search = append( t_search, Search{keyword:config.search, sort:"indexed", order:"asc"} )
+	t_search = append( t_search, Search{keyword:config.search, sort:"", order:"desc"} )
 
 	var n_search = len(t_search)
 	var search_index = 0
@@ -498,19 +498,24 @@ func main() {
 			if page == 1 {
 				t_search[search_index].TotalCount = r.TotalCount
 				max_page = int( math.Ceil( float64(t_search[search_index].TotalCount)/100.00 ) )
-
-				if r.TotalCount > 1000 {
-					if current_search.language == "" && len(t_languages) > 0 {
-						addSearchLanguage( current_search )
-						PrintInfos( "debug", fmt.Sprintf("current search returned %d results, language filter added for later search",t_search[search_index].TotalCount) )
-					} else if len(t_noise) > 0 {
-						addSearchNoise( current_search )
-						PrintInfos( "debug", fmt.Sprintf("current search returned %d results, noise added for later search",t_search[search_index].TotalCount) )
-					}
-					n_search = len(t_search)
-				} else {
-					PrintInfos( "debug", fmt.Sprintf("current search returned %d results", t_search[search_index].TotalCount) )
+				if max_page > 10 {
+					max_page = 10
 				}
+
+				PrintInfos( "debug", fmt.Sprintf("current search returned %d results", t_search[search_index].TotalCount) )
+
+				// if r.TotalCount > 1000 {
+				// 	if current_search.language == "" && len(t_languages) > 0 {
+				// 		addSearchLanguage( current_search )
+				// 		PrintInfos( "debug", fmt.Sprintf("current search returned %d results, language filter added for later search",t_search[search_index].TotalCount) )
+				// 	} else if len(t_noise) > 0 {
+				// 		addSearchNoise( current_search )
+				// 		PrintInfos( "debug", fmt.Sprintf("current search returned %d results, noise added for later search",t_search[search_index].TotalCount) )
+				// 	}
+				// 	n_search = len(t_search)
+				// } else {
+				// 	PrintInfos( "debug", fmt.Sprintf("current search returned %d results", t_search[search_index].TotalCount) )
+				// }
 			}
 
 			for _, i := range r.Items {

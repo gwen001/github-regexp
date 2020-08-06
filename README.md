@@ -67,6 +67,7 @@ export GITHUB_TOKEN=token1,token2...
 # Changelog
 
 **06/08/2020**
+- disabled languages and noise searches
 - added an option to display urls only
 - added an option to display only the matched parts
 - added an option to force the regexp to be case insensitive
