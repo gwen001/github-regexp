@@ -66,6 +66,9 @@ export GITHUB_TOKEN=token1,token2...
 
 # Changelog
 
+**13/08/2020**
+- fixed some types & output bugs
+
 **06/08/2020**
 - disabled languages and noise searches
 - added an option to display urls only
