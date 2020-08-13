@@ -38,11 +38,8 @@ type Config struct {
 	output_mode int
 	domain string
 	output string
-	fpOutput *os.File
-	// token []string
 	tokens []Token
 	extend bool
-	raw bool
 	search string
 	delay time.Duration
 	regexp *regexp.Regexp
@@ -478,8 +475,8 @@ func main() {
 			var r = githubSearch( config.tokens[token_index].datoken, current_search, page )
 
 			if len(r.Message) > 0 {
-				fmt.Println(r.Message)
-				fmt.Println(r.DocumentationUrl)
+				// fmt.Println(r.Message)
+				// fmt.Println(r.DocumentationUrl)
 				if strings.HasPrefix(r.Message,"Only the first") {
 					// Only the first 1000 search results are available
 					PrintInfos("debug", "search limit reached")

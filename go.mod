@@ -1,4 +1,4 @@
-module github.com/gwen001/github-subdomains
+module github.com/gwen001/github-regexp
 
 go 1.13
 
