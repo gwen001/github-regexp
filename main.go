@@ -35,6 +35,8 @@ type Search struct {
 }
 
 type Config struct {
+	stop_notoken bool
+	quick_mode bool
 	output_mode int
 	domain string
 	output string
@@ -72,25 +74,34 @@ func parseToken( token string ) {
 	if token == "" {
 		token = os.Getenv("GITHUB_TOKEN")
 		if token == "" {
-			token = readTokenFromFile()
+			token = readTokenFromFile(".tokens")
 			if token == "" {
 				flag.Usage()
 				fmt.Printf("\ntoken not found\n")
 				os.Exit(-1)
 			}
 		}
+	} else {
+		if _, err := os.Stat(token); os.IsNotExist(err) {
+			// path/to/whatever does not exist
+		} else {
+			token = readTokenFromFile( token )
+		}
 	}
 
 	var t_tokens = strings.Split(token, ",")
+	var re = regexp.MustCompile(`[0-9a-f]{40}`)
 
 	for _,t := range t_tokens {
-		config.tokens = append( config.tokens, Token{datoken:t,disabled_ts:0} )
+		if re.MatchString(t) {
+			config.tokens = append( config.tokens, Token{datoken:t,disabled_ts:0} )
+		}
 	}
 }
 
-func readTokenFromFile() string {
+func readTokenFromFile( tokenfile string ) string {
 
-	b, err := ioutil.ReadFile(".tokens")
+	b, err := ioutil.ReadFile( tokenfile )
 
     if err != nil {
         return ""
@@ -112,6 +123,11 @@ func readTokenFromFile() string {
 func loadLanguages(filename string) bool {
 
 	t_languages = nil
+
+	if filename == "none" {
+		return true
+	}
+
 	b, err := ioutil.ReadFile(filename)
 
     if err != nil {
@@ -133,6 +149,11 @@ func loadLanguages(filename string) bool {
 func loadNoise(filename string) bool {
 
 	t_noise = nil
+
+	if filename == "none" {
+		return true
+	}
+
 	b, err := ioutil.ReadFile(filename)
 
     if err != nil {
@@ -372,17 +393,17 @@ func main() {
 
 	var token string
 	var rgxp string
-	var stop_notoken bool
 	var output_urls bool
 	var output_matchedparts bool
 	var force_ignorecase bool
 	var f_language string
 	var f_noise string
 
+	flag.BoolVar( &config.quick_mode, "q", false, "quick mode, avoid extra searches with languages and noise added" )
 	flag.StringVar( &config.search, "s", "", "search term you are looking for (required)" )
 	flag.StringVar( &rgxp, "r", "", "regexp to search, default is SecLists secret-keywords list" )
-	flag.StringVar( &token, "t", "", "github token (required)" )
-	flag.BoolVar( &stop_notoken, "k", false, "exit the program when all tokens have been disabled" )
+	flag.StringVar( &token, "t", "", "github token (required), can be:\n  • a single token\n  • a list of tokens separated by comma\n  • a file containing 1 token per line\nif the options is not provided, the environment variable GITHUB_TOKEN is readed, it can be:\n  • a single token\n  • a list of tokens separated by comma" )
+	flag.BoolVar( &config.stop_notoken, "k", false, "exit the program when all tokens have been disabled" )
 	flag.BoolVar( &force_ignorecase, "i", false, "force the regexp to be case insensitive" )
 	flag.BoolVar( &output_urls, "u", false, "display only urls" )
 	flag.BoolVar( &output_matchedparts, "o", false, "display only matched parts" )
@@ -428,19 +449,26 @@ func main() {
 
 	config.delay = time.Duration( 60.0 / (30*float64(n_token)) * 1000 + 200)
 
-	if f_language != "" {
-		loadLanguages( f_language )
-	}
-
-	if f_noise != "" {
-		loadNoise( f_noise )
+	if( config.quick_mode ) {
+		t_languages = nil
+		t_noise = nil
+	} else {
+		if f_language != "" {
+			loadLanguages( f_language )
+		}
+		if f_noise != "" {
+			loadNoise( f_noise )
+		}
 	}
 
 	displayConfig()
 
 	t_search = append( t_search, Search{keyword:config.search, sort:"indexed", order:"desc"} )
-	t_search = append( t_search, Search{keyword:config.search, sort:"indexed", order:"asc"} )
-	t_search = append( t_search, Search{keyword:config.search, sort:"", order:"desc"} )
+
+	if( config.quick_mode ) {
+		t_search = append( t_search, Search{keyword:config.search, sort:"indexed", order:"asc"} )
+		t_search = append( t_search, Search{keyword:config.search, sort:"", order:"desc"} )
+	}
 
 	var n_search = len(t_search)
 	var search_index = 0
@@ -464,7 +492,7 @@ func main() {
 			if token_index < 0 {
 				token_index = -1
 
-				if( stop_notoken ) {
+				if( config.stop_notoken ) {
 					PrintInfos("error", "no more token available, exiting")
 					os.Exit(-1)
 				}
@@ -502,18 +530,26 @@ func main() {
 
 				PrintInfos( "debug", fmt.Sprintf("current search returned %d results", t_search[search_index].TotalCount) )
 
-				// if r.TotalCount > 1000 {
-				// 	if current_search.language == "" && len(t_languages) > 0 {
-				// 		addSearchLanguage( current_search )
-				// 		PrintInfos( "debug", fmt.Sprintf("current search returned %d results, language filter added for later search",t_search[search_index].TotalCount) )
-				// 	} else if len(t_noise) > 0 {
-				// 		addSearchNoise( current_search )
-				// 		PrintInfos( "debug", fmt.Sprintf("current search returned %d results, noise added for later search",t_search[search_index].TotalCount) )
-				// 	}
-				// 	n_search = len(t_search)
-				// } else {
-				// 	PrintInfos( "debug", fmt.Sprintf("current search returned %d results", t_search[search_index].TotalCount) )
-				// }
+				if r.TotalCount > 1000 {
+					if( config.quick_mode ) {
+						// if search_index == 0 {
+						// 	t_search = append( t_search, Search{keyword:config.search, sort:"indexed", order:"asc"} )
+						// 	t_search = append( t_search, Search{keyword:config.search, sort:"", order:"desc"} )
+						// 	PrintInfos( "debug", fmt.Sprintf("current search returned %d results, extra searches added",t_search[search_index].TotalCount) )
+						// }
+					} else {
+						if current_search.language == "" && len(t_languages) > 0 {
+							addSearchLanguage( current_search )
+							PrintInfos( "debug", fmt.Sprintf("current search returned %d results, language filter added for later search",t_search[search_index].TotalCount) )
+						} else if len(t_noise) > 0 {
+							addSearchNoise( current_search )
+							PrintInfos( "debug", fmt.Sprintf("current search returned %d results, noise added for later search",t_search[search_index].TotalCount) )
+						}
+					}
+					n_search = len(t_search)
+				} else {
+					PrintInfos( "debug", fmt.Sprintf("current search returned %d results", t_search[search_index].TotalCount) )
+				}
 			}
 
 			for _, i := range r.Items {
@@ -654,6 +690,7 @@ func resliceTokens(s []Token, index int) []Token {
 func displayConfig() {
 	PrintInfos( "", fmt.Sprintf("Search:%s, Regexp:%s",config.search,config.regexp) )
 	PrintInfos( "", fmt.Sprintf("Tokens:%d, Delay:%.0fms",len(config.tokens),float32(config.delay)) )
+	PrintInfos( "", fmt.Sprintf("Token rehab:%t, Quick mode:%t",!config.stop_notoken,config.quick_mode) )
 	PrintInfos( "", fmt.Sprintf("Languages:%d, Noise:%d",len(t_languages),len(t_noise)) )
 }
 
