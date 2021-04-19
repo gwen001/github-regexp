@@ -321,8 +321,12 @@ func printMatch( code string, match []int ) string {
 	var suffix = get_suffix( code, match[1], config.n_context );
 	// fmt.Printf( ">>>%s<<<", suffix )
 
-	var start_line = strings.Count( code[0:match[0]-len(prefix)], "\n" ) + 1;
+	var e = match[0]-len(prefix)
+	// fmt.Printf( ">>>%d %d %d<<<\n", match[0], len(prefix), e )
+	var start_line = strings.Count( code[0:e], "\n" ) + 1;
+	// fmt.Printf( ">>>%s<<<", start_line )
 	var final_string = fmt.Sprintf( "%s%s%s", format_string(prefix), au.BrightGreen(format_string(code[match[0]:match[1]])), format_string(suffix) )
+	// fmt.Printf( ">>>%s<<<", final_string )
 
 	var t_str = strings.Split( final_string, "\n" )
 	var output string
@@ -352,6 +356,10 @@ func get_prefix( code string, pos int, n_lines int ) string {
 		pos = Strpos( code, "\n", pos ) + 1
     }
 
+	if pos > 500 {
+		pos = 100
+	}
+
     var prefix = code[0:pos]
 
     // return Strrev(prefix)
@@ -366,6 +374,10 @@ func get_suffix( code string, pos int, n_lines int ) string {
     for i:=0 ; i<n_lines ; i++ {
         pos = Strpos( code, "\n", pos ) + 1
     }
+
+	if pos > 500 {
+		pos = 100
+	}
 
 	var suffix = code[0:pos]
 
