@@ -6,7 +6,7 @@ Basically a regexp over a GitHub search.
 # Install
 
 ```
-go get -u github.com/gwen001/github-regexp
+go install github.com/gwen001/github-regexp@latest
 ```
 
 or
