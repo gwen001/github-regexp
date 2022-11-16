@@ -1,7 +1,12 @@
+<p align="left">
+    <img src="https://img.shields.io/badge/go-v1.13-blue" alt="go badge">
+    <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license badge">
+    <a href="https://twitter.com/intent/tweet?text=https%3a%2f%2fgithub.com%2fgwen001%2fgithub-regexp%2f" target="_blank"><img src="https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fgwen001%2Fgithub-regexp" alt="twitter badge"></a>
+</p>
+
 # github-regexp
 
 Basically a regexp over a GitHub search.
-
 
 # Install
 
@@ -16,7 +21,6 @@ git clone https://github.com/gwen001/github-regexp
 cd github-regexp
 go install
 ```
-
 
 # Usage
 
@@ -56,13 +60,11 @@ You can disable that feature by using the option `-k`.
 
 <img src="https://github.com/gwen001/github-regexp/raw/master/preview.png">
 
-
 # Todo
 
 - fix the output bug when the file is only 1 line (strpos)
 - change the order of the extra searches ?
 - ?
-
 
 # Changelog
 
@@ -84,8 +86,7 @@ You can disable that feature by using the option `-k`.
 - added an option to force the regexp to be case insensitive
 - creation
 
-
 ---
 
-Feel free to ping me on Twitter if you have any problem to use the script.  
-https://twitter.com/gwendallecoguic
+Feel free to [open an issue](/../../issues/) if you have any problem with the script.  
+
