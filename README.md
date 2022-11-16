@@ -25,7 +25,7 @@ go install
 # Usage
 
 ```
-github-regexp -h
+$ github-regexp -h
 
 Usage of github-regexp:
   -i	force the regexp to be case insensitive
