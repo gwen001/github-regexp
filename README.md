@@ -16,7 +16,7 @@
 
 ---
 
-# Install
+## Install
 
 ```
 go install github.com/gwen001/github-regexp@latest
@@ -30,7 +30,7 @@ cd github-regexp
 go install
 ```
 
-# Usage
+## Usage
 
 ```
 $ github-regexp -h
@@ -46,7 +46,7 @@ Usage of github-regexp:
     	github token (required), can be:
     	  • a single token
     	  • a list of tokens separated by comma
-    	  • a file containing 1 token per line
+    	  • a file (.tokens) containing 1 token per line
     	if the options is not provided, the environment variable GITHUB_TOKEN is readed, it can be:
     	  • a single token
     	  • a list of tokens separated by comma
@@ -68,13 +68,13 @@ You can disable that feature by using the option `-k`.
 
 <img src="https://github.com/gwen001/github-regexp/raw/master/preview.png">
 
-# Todo
+## Todo
 
 - fix the output bug when the file is only 1 line (strpos)
 - change the order of the extra searches ?
 - ?
 
-# Changelog
+## Changelog
 
 **25/09/2020**
 - quick mode added

@@ -422,7 +422,7 @@ func main() {
 	flag.BoolVar( &config.quick_mode, "q", false, "quick mode, avoid extra searches with languages and noise added" )
 	flag.StringVar( &config.search, "s", "", "search term you are looking for (required)" )
 	flag.StringVar( &rgxp, "r", "", "regexp to search, default is SecLists secret-keywords list" )
-	flag.StringVar( &token, "t", "", "github token (required), can be:\n  • a single token\n  • a list of tokens separated by comma\n  • a file containing 1 token per line\nif the options is not provided, the environment variable GITHUB_TOKEN is readed, it can be:\n  • a single token\n  • a list of tokens separated by comma" )
+	flag.StringVar( &token, "t", "", "github token (required), can be:\n  • a single token\n  • a list of tokens separated by comma\n  • a file (.tokens) containing 1 token per line\nif the options is not provided, the environment variable GITHUB_TOKEN is readed, it can be:\n  • a single token\n  • a list of tokens separated by comma" )
 	flag.BoolVar( &config.stop_notoken, "k", false, "exit the program when all tokens have been disabled" )
 	flag.BoolVar( &force_ignorecase, "i", false, "force the regexp to be case insensitive" )
 	flag.BoolVar( &output_urls, "u", false, "display only urls" )
