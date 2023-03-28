@@ -16,6 +16,11 @@
 
 ---
 
+## Description
+
+This Go tool performs the search supplied by the user on GitHub and apply the regexp also supplied by the user on all results.
+This can be use to find subdomains, endpoints, passwords, api keys...
+
 ## Install
 
 ```
